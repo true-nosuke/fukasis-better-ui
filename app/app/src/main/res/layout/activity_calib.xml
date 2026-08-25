@@ -51,6 +51,20 @@
             tools:layout_editor_absoluteY="54dp" />
 
 
+
+        <TextView
+            android:id="@+id/bright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brightness" />
+        <SeekBar
+            android:id="@+id/bright_bar"
+            android:layout_height="30dp"
+            android:layout_width="match_parent"
+            android:min="350"
+            android:max="600"
+            app:layout_constraintStart_toStartOf="parent"/>
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -85,13 +99,11 @@
 
 
 
-
-
         <TextView
             android:id="@+id/t1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="50" />
+            android:text=" 0th-Order: 50px" />
         <SeekBar
             android:id="@+id/sb1"
             android:layout_height="30dp"

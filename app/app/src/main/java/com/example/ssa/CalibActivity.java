@@ -78,6 +78,8 @@ public class CalibActivity extends AppCompatActivity{
         Button openBtn = binding.open;
         Button exportBtn = binding.export;
         SeekBar sb1 = binding.sb1;
+        SeekBar brightBar = binding.brightBar;
+
         TextView t1 = binding.t1;
         sb = new SeekBar[]{binding.sb2,binding.sb3,binding.sb4,binding.sb5};
         tv = new TextView[]{binding.t2,binding.t3,binding.t4,binding.t5};
@@ -98,6 +100,22 @@ public class CalibActivity extends AppCompatActivity{
         
         path_et1 = binding.input1;
         path_et2 = binding.input2;
+        brightBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                Log.d("a", "" + i);
+                brightBar.setProgress(i);
+                iv1.setColorFilter(i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
         openBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 ContentResolver resolver = getContentResolver();
@@ -164,7 +182,7 @@ public class CalibActivity extends AppCompatActivity{
 
             }
         });
-                FloatingActionButton homeButton = binding.homeButton;
+        FloatingActionButton homeButton = binding.homeButton;
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,11 +222,12 @@ public class CalibActivity extends AppCompatActivity{
 
             }
         });
+
         sb1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 Log.d("a","" + i);
-                t1.setText("" + i);
+                t1.setText(" 0th-Order:" + i + "px");
                 fol = imgWidth - i;
                 l1.setX(pos[0]+dispWidth2+(-imgWidth + fol + iv2_ofs)*scale);
                 l1.setY(pos[1]-50);
