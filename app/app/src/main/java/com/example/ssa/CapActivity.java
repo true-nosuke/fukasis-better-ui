@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.net.Uri;
@@ -68,6 +69,9 @@ public class CapActivity extends AppCompatActivity {
     private boolean isIsoLocked = false;
     private boolean isExpoLocked = false;
     private boolean isLineLocked = false;
+    private boolean restoringValues = false;
+
+    private static final String PREFS_NAME = "capture_settings";
 
     private TextureView tv1;
     private TextureView tv2;
@@ -206,7 +210,9 @@ if (isLine) {
                 fd = (float) i / 100.0f;
                 focusTxt.setText("Focus:" + fd + "");
 
-                cam.changeValueOfPreview(0, fd, 0, -1);
+                if (!restoringValues) {
+                    cam.changeValueOfPreview(0, fd, 0, -1);
+                }
             }
 
             @Override
@@ -337,7 +343,9 @@ if (isLine) {
                 }
 
                 isoTxt.setText("ISO:" + iso + "");
-                cam.changeValueOfPreview(iso, -100, 0, -1);
+                if (!restoringValues) {
+                    cam.changeValueOfPreview(iso, -100, 0, -1);
+                }
             }
 
             @Override
@@ -366,7 +374,9 @@ if (isLine) {
                 // 2. ナノ秒（Camera2 API用）は大きな整数になるので (long) にキャストする
                 expo = (long) (ms * 1000000.0);
 
-                cam.changeValueOfPreview(0, -100, expo, -1);
+                if (!restoringValues) {
+                    cam.changeValueOfPreview(0, -100, expo, -1);
+                }
             }
 
             @Override
@@ -407,6 +417,15 @@ if (isLine) {
         // cam object
         cam = new Cam(this, camId, soundPool, alarmSound, shatterSound, tv1, tv2, captureStatusIcon);
 
+        restoringValues = true;
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        expoSw.setChecked(preferences.getBoolean("long_exposure", false));
+        focusBar.setProgress(preferences.getInt("focus_progress", focusBar.getProgress()));
+        isoBar.setProgress(preferences.getInt("iso_progress", isoBar.getProgress()));
+        expoBar.setProgress(preferences.getInt("expo_progress", expoBar.getProgress()));
+        lineBar.setProgress(preferences.getInt("line_progress", lineBar.getProgress()));
+        restoringValues = false;
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA },
                     CAMERA_PERMISSION_REQUEST_CODE);
@@ -429,6 +448,14 @@ if (isLine) {
 
     @Override
     protected void onPause() {
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        preferences.edit()
+            .putBoolean("long_exposure", binding.expoSwitch.isChecked())
+            .putInt("focus_progress", binding.focusBar.getProgress())
+            .putInt("iso_progress", binding.isoBar.getProgress())
+            .putInt("expo_progress", binding.expoBar.getProgress())
+            .putInt("line_progress", binding.lineBar.getProgress())
+            .apply();
         super.onPause();
         cam.closeCam();
         cam.stopBackgroundThread();
